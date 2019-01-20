@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sammyboe.deadland_mobile.Assets.ZombieAssets;
+import com.sammyboe.deadland_mobile.Utils.GameVar;
 
 public class Zombie extends Character {
     public enum State{appear, move, dying,dead};
@@ -13,9 +14,10 @@ public class Zombie extends Character {
     public Texture zombieTexture;
     public TextureAtlas zombieAtlas;
     public Animation<TextureRegion> animation;
+    private boolean followX = false, followY = false;
 
     public Zombie(World world, int x, int y){
-        super(world, ZombieAssets.manager.get(ZombieAssets.zombieStandDown, Texture.class), x, y);
+        super(world, ZombieAssets.manager.get(ZombieAssets.zombieStandDown, Texture.class), x, y, Type.zombie);
         zombieTexture = this.getTexture();
         state = Zombie.State.appear;
         spriteSelection();
@@ -57,6 +59,46 @@ public class Zombie extends Character {
                 break;
             default:
                 break;
+        }
+    }
+
+    public void followHero(Hero hero){
+        if(state == State.move){
+            float heroX = hero.body.getPosition().x;
+            float heroY = hero.body.getPosition().y;
+            float zombieX =this.body.getPosition().x;
+            float zombieY = this.body.getPosition().y;
+            if(!followX&&!followY){
+                float deltaX = Math.abs(zombieX - heroX);
+                float deltaY = Math.abs(zombieY - heroY);
+                if(deltaX>=deltaY){
+                    followX = true;
+                    followY = false;
+                }else{
+                    followX = false;
+                    followY = true;
+                }
+            }
+            if(followX){
+                if(heroX-(3/GameVar.PPM)<zombieX && heroX+(3/GameVar.PPM)>zombieX){
+                    followX=false;
+                    followY=true;
+                }else if(heroX>zombieX){
+                    this.setDirection(Direction.right);
+                }else{
+                    this.setDirection(Direction.left);
+                }
+            }else{
+                if(heroY-(2/GameVar.PPM)<zombieY && heroY+(2/GameVar.PPM)>zombieY){
+                    followX=true;
+                    followY=false;
+                }else if(heroY>zombieY){
+                    this.setDirection(Direction.up);
+                }else{
+                    this.setDirection(Direction.down);
+                }
+            }
+            this.moveCharacter();
         }
     }
 }

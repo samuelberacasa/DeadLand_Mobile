@@ -15,7 +15,7 @@ public class Hero extends Character {
     public Animation<TextureRegion> animation;
 
     public Hero(World world, int x, int y){
-        super(world, HeroAssets.manager.get(HeroAssets.heroTextureStandDown, Texture.class),x, y);
+        super(world, HeroAssets.manager.get(HeroAssets.heroTextureStandDown, Texture.class),x, y, Type.hero);
         heroTexture = this.getTexture();
         state = State.stand;
         spriteSelection();

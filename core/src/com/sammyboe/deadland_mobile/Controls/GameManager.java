@@ -24,22 +24,22 @@ public class GameManager implements InputProcessor {
             case Input.Keys.DOWN:
                 hero.setDirection(Character.Direction.down);
                 hero.setState(Hero.State.move);
-                hero.body.setLinearVelocity(0,-5);
+                hero.moveCharacter();
                 break;
             case Input.Keys.LEFT:
                 hero.setDirection(Character.Direction.left);
                 hero.setState(Hero.State.move);
-                hero.body.setLinearVelocity(-5,0);
+                hero.moveCharacter();
                 break;
             case Input.Keys.RIGHT:
                 hero.setDirection(Character.Direction.right);
                 hero.setState(Hero.State.move);
-                hero.body.setLinearVelocity(5,0);
+                hero.moveCharacter();
                 break;
             case Input.Keys.UP:
                 hero.setDirection(Character.Direction.up);
                 hero.setState(Hero.State.move);
-                hero.body.setLinearVelocity(0,5);
+                hero.moveCharacter();
                 break;
             case Input.Keys.D:
                 hero.setState(Hero.State.knife);

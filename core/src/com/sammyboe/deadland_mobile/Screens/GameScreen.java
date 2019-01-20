@@ -95,6 +95,7 @@ public class GameScreen extends AbstractScreen implements ContactListener {
 
     public void updateGame(float delta){
         hero.updateCharacter();
+        zombie.followHero(hero);
         zombie.updateCharacter();
         cameraUpdate(delta);
         game.batch.setProjectionMatrix(camera.combined);
@@ -141,7 +142,17 @@ public class GameScreen extends AbstractScreen implements ContactListener {
 
     @Override
     public void beginContact(Contact contact) {
-        System.out.println("CONTACT");
+        Fixture bodyA, bodyB;
+
+        if(contact.getFixtureA().getUserData() == "hero"){
+            bodyA = contact.getFixtureA();
+            bodyB = contact.getFixtureB();
+        }else{
+            bodyB = contact.getFixtureA();
+            bodyA = contact.getFixtureB();
+        }
+
+        System.out.println(bodyA.getUserData());
     }
 
     @Override
