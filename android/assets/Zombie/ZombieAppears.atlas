@@ -1,0 +1,40 @@
+
+ZombieAppears.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Appears1
+  rotate: false
+  xy: 1, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+Appears2
+  rotate: false
+  xy: 1, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+Appears3
+  rotate: false
+  xy: 63, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+Appears4
+  rotate: false
+  xy: 1, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+Appears5
+  rotate: false
+  xy: 63, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1

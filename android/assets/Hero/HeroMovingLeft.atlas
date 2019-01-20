@@ -1,0 +1,47 @@
+
+HeroMovingLeft.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+MLeft1
+  rotate: false
+  xy: 1, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MLeft2
+  rotate: false
+  xy: 1, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MLeft3
+  rotate: false
+  xy: 63, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MLeft4
+  rotate: false
+  xy: 1, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MLeft5
+  rotate: false
+  xy: 63, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MLeft6
+  rotate: false
+  xy: 63, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1

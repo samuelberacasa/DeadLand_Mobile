@@ -1,0 +1,47 @@
+
+HeroKnifeUp.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+tile000
+  rotate: false
+  xy: 1, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+tile001
+  rotate: false
+  xy: 1, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+tile002
+  rotate: false
+  xy: 63, 149
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+tile003
+  rotate: false
+  xy: 1, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+tile004
+  rotate: false
+  xy: 63, 75
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+tile005
+  rotate: false
+  xy: 63, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1

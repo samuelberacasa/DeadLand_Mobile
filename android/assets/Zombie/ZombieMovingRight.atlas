@@ -1,0 +1,33 @@
+
+ZombieMovingRight.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+MRight1
+  rotate: false
+  xy: 1, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MRight2
+  rotate: false
+  xy: 63, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MRight3
+  rotate: false
+  xy: 125, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
+MRight4
+  rotate: false
+  xy: 187, 1
+  size: 60, 72
+  orig: 60, 72
+  offset: 0, 0
+  index: -1
