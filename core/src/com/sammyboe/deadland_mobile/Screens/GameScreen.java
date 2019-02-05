@@ -1,19 +1,20 @@
 package com.sammyboe.deadland_mobile.Screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.sammyboe.deadland_mobile.Characters.Character;
+import com.badlogic.gdx.utils.Array;
+import com.sammyboe.deadland_mobile.Assets.ElementAssets;
 import com.sammyboe.deadland_mobile.Characters.Hero;
 import com.sammyboe.deadland_mobile.Characters.Zombie;
 import com.sammyboe.deadland_mobile.Controls.GameManager;
+import com.sammyboe.deadland_mobile.Elements.Bullet;
 import com.sammyboe.deadland_mobile.GameMain;
+import com.sammyboe.deadland_mobile.TiledMap.GameMap;
 import com.sammyboe.deadland_mobile.Utils.GameVar;
 
 import java.awt.event.KeyEvent;
@@ -21,24 +22,49 @@ import java.awt.event.KeyEvent;
 public class GameScreen extends AbstractScreen implements ContactListener {
     public BitmapFont font;
     public Hero hero;
-    public Zombie zombie;
+    public Array<Zombie> zombieArray;
     public World world;
     public GameManager manager;
     private Box2DDebugRenderer b2dr;
-    private float timePassed=0;
-    private float timePassedHero = 0;
-    private float timePassedZombie = 0;
+    public GameMap map;
+    private int level;
+    public Texture staminaUp;
+    public Texture juggernaut;
+    public Texture levelTexture;
+    public Texture screenPlayer;
+    public Texture letterM;
+    public Texture letterR;
+    public Texture letter7;
+    public Texture bloodScreen;
+    public float startLevelTimePassed;
+    public float recoverTimePassed;
+    private int lifePoints;
 
     public GameScreen(GameMain game) {
         super(game);
         b2dr = new Box2DDebugRenderer();
         font = new BitmapFont();
         world = new World(new Vector2(0,0),true);
-        hero = new Hero(this.world, -50, -50);
-        zombie = new Zombie(this.world, 100, 100);
-        manager = new GameManager(world, hero);
+        map = new GameMap();
+        map.parseTileObjectLayer(world,map.tiledMap.getLayers().get("maplimits").getObjects());
+        hero = new Hero(this.world, this.map.getWidth()/2, this.map.getHeight()/2);
+        zombieArray = new Array<Zombie>();
+        manager = new GameManager(world, hero, game);
         Gdx.input.setInputProcessor(manager);
         world.setContactListener(this);
+        level = 1;
+        staminaUp = ElementAssets.manager.get(ElementAssets.staminaUp);
+        juggernaut = ElementAssets.manager.get(ElementAssets.juggernaut);
+        levelTexture = ElementAssets.manager.get(ElementAssets.level1);
+        screenPlayer = ElementAssets.manager.get(ElementAssets.screen);
+        letterM = ElementAssets.manager.get(ElementAssets.letterM);
+        letterR = ElementAssets.manager.get(ElementAssets.letterR);
+        letter7 = ElementAssets.manager.get(ElementAssets.letter7);
+        bloodScreen = ElementAssets.manager.get(ElementAssets.blood);
+        startLevelTimePassed=0;
+        recoverTimePassed=0;
+        lifePoints = 5;
+        fillZombies();
     }
 
     @Override
@@ -54,51 +80,195 @@ public class GameScreen extends AbstractScreen implements ContactListener {
 
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        map.mapRenderer.render();
         game.batch.begin();
-        timePassed+=delta;
-        timePassedHero+=delta;
+        hero.timePassed+=delta;
+        if(hero.weapon.bulletArray.size > 0){
+            for(Bullet bullet : hero.weapon.bulletArray){
+                game.batch.draw(bullet.texture, bullet.x, bullet.y);
+            }
+        }
+        for(Zombie zombie:zombieArray){
+            if(zombie.posY>hero.posY){
+                switch (zombie.state){
+                    case appear:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,false),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.animation.isAnimationFinished(zombie.timePassed)){
+                            zombie.timePassed=0;
+                            zombie.setState(Zombie.State.move);
+                        }
+                        break;
+                    case move:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,true),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        break;
+                    case stop:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,true),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.timePassed > 0.5){
+                            zombie.setState(Zombie.State.move);
+                        }
+                        break;
+                    case dying:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,false),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.animation.isAnimationFinished(zombie.timePassed)){
+                            zombie.timePassed=0;
+                            world.destroyBody(zombie.body);
+                            zombieArray.removeValue(zombie,true);
+                            if(zombieArray.size==0){
+                                this.setNextLevel();
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         switch (hero.state){
             case stand:
-                game.batch.draw(hero.heroTexture,hero.getX(),hero.getY());
+                game.batch.draw(hero.texture,hero.posX,hero.posY);
                 break;
             default:
-                game.batch.draw(hero.animation.getKeyFrame(timePassed,true),hero.getX(),hero.getY());
+                game.batch.draw(hero.animation.getKeyFrame(hero.timePassed,true),hero.posX,hero.posY);
         }
-        switch (zombie.state){
-            case appear:
-                game.batch.draw(zombie.animation.getKeyFrame(timePassedZombie,false),zombie.getX(),zombie.getY());
-                timePassedZombie+=delta;
-                if(zombie.animation.isAnimationFinished(timePassedZombie)){
-                    timePassedZombie=0;
-                    zombie.setState(Zombie.State.move);
+        for(Zombie zombie:zombieArray){
+            if(zombie.posY<hero.posY){
+                switch (zombie.state){
+                    case appear:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,false),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.animation.isAnimationFinished(zombie.timePassed)){
+                            zombie.timePassed=0;
+                            zombie.setState(Zombie.State.move);
+                        }
+                        break;
+                    case move:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,true),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        break;
+                    case stop:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,true),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.timePassed > 0.5){
+                            zombie.setState(Zombie.State.move);
+                        }
+                        break;
+                    case dying:
+                        game.batch.draw(zombie.animation.getKeyFrame(zombie.timePassed,false),zombie.posX,zombie.posY);
+                        zombie.timePassed+=delta;
+                        if(zombie.animation.isAnimationFinished(zombie.timePassed)){
+                            zombie.timePassed=0;
+                            world.destroyBody(zombie.body);
+                            zombieArray.removeValue(zombie,true);
+                            if(zombieArray.size==0){
+                                this.setNextLevel();
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                break;
-            case move:
-                game.batch.draw(zombie.animation.getKeyFrame(timePassed,true),zombie.getX(),zombie.getY());
-                break;
-            case dying:
-                game.batch.draw(zombie.animation.getKeyFrame(timePassedZombie,false),zombie.getX(),zombie.getY());
-                timePassedZombie+=delta;
-                if(zombie.animation.isAnimationFinished(timePassedZombie)){
-                    timePassedZombie=0;
-                    zombie.setState(Zombie.State.dead);
-                }
-                break;
-            default:
-                break;
+            }
+        }
+        game.batch.draw(screenPlayer, hero.posX-325, hero.posY+150);
+        game.batch.draw(levelTexture, hero.posX-190, hero.posY+140);
+        if (level > 1) {
+            game.batch.draw(juggernaut, hero.posX-275, hero.posY+200);
+        }else if(level > 2){
+            game.batch.draw(staminaUp, hero.posX-235, hero.posY+200);
+        }
+        if(startLevelTimePassed>0&&startLevelTimePassed<4){
+            startLevelTimePassed+=delta;
+            if(level == 2){
+                font.draw(game.batch, "NEW SKILL - HARDLINE (+ HEALTH)", hero.posX-320, hero.posY+140);
+            }
+            if(level == 3){
+                font.draw(game.batch, "NEW SKILL - STAMINA UP (+ SPEED)", hero.posX-320, hero.posY+140);
+            }
+            if(startLevelTimePassed>3){
+                startLevelTimePassed=0;
+            }
+        }
+        game.batch.draw(letterM, hero.posX-265, hero.posY+150);
+        game.batch.draw(letterR, hero.posX-240, hero.posY+150);
+        game.batch.draw(letter7, hero.posX-215, hero.posY+150);
+        if (lifePoints < 5){
+            game.batch.draw(bloodScreen, hero.posX-330, hero.posY-190);
         }
         game.batch.end();
-        b2dr.render(world,camera.combined.scl(GameVar.PPM));
+        //b2dr.render(world,camera.combined.scl(GameVar.PPM));
 
         world.step(1/30f,6,2);
+        if(lifePoints<5){
+            recoverTimePassed+=delta;
+            if(recoverTimePassed>3){
+                lifePoints=5;
+                recoverTimePassed=0;
+            }
+        }
+    }
+
+    private void setNextLevel() {
+        this.level++;
+        this.startLevelTimePassed+=0.00000001;
+        if(this.level == 2){
+            levelTexture = ElementAssets.manager.get(ElementAssets.level2);
+        }if(this.level == 3){
+            levelTexture = ElementAssets.manager.get(ElementAssets.level3);
+            hero.speed=1;
+        }
+        this.fillZombies();
     }
 
     public void updateGame(float delta){
-        hero.updateCharacter();
-        zombie.followHero(hero);
-        zombie.updateCharacter();
+        hero.updatePosition();
+        hero.updateBullets();
+        this.updateZombies();
+        this.checkCollision();
         cameraUpdate(delta);
+        map.mapRenderer.setView(camera);
         game.batch.setProjectionMatrix(camera.combined);
+    }
+
+    public void checkCollision(){
+        if(hero.weapon.bulletArray.size > 0){
+            for(Bullet bullet : hero.weapon.bulletArray){
+                for(Zombie zombie:zombieArray){
+                    if(zombie.inDistanceBullet(this.hero)&&zombie.rectangleBody!=null){
+                        if(bullet.overlaps(zombie.rectangleBody)){
+                            zombie.takeDamage(hero.weapon.damage);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void fillZombies(){
+        if(level < 3){
+            for(int i = 0; i< level*4; i++){
+                int posX = (int) (Math.random()*this.map.getWidth()/2)+this.map.getWidth()/4;
+                int posY = (int) (Math.random()*this.map.getHeight()/2)+this.map.getHeight()/4;
+                zombieArray.add(new Zombie(this.world, posX, posY, i));
+            }
+        }else{
+            for(int i = 0; i< level*10; i++){
+                int posX = (int) (Math.random()*this.map.getWidth()-50)+50;
+                int posY = (int) (Math.random()*this.map.getHeight()-50)+50;
+                zombieArray.add(new Zombie(this.world, posX, posY, i));
+            }
+        }
+    }
+
+    public void updateZombies(){
+        for(Zombie zombie:zombieArray){
+            zombie.followHero(hero);
+            zombie.updatePosition();
+            zombie.updateRectangle();
+        }
     }
 
     public void cameraUpdate(float delta){
@@ -134,25 +304,38 @@ public class GameScreen extends AbstractScreen implements ContactListener {
     @Override
     public void dispose() {
         font.dispose();
-        hero.getTexture().dispose();
         world.dispose();
         b2dr.dispose();
-        hero.heroAtlas.dispose();
+        map.dispose();
     }
 
     @Override
     public void beginContact(Contact contact) {
-        Fixture bodyA, bodyB;
+        Fixture hero, zombie;
 
         if(contact.getFixtureA().getUserData() == "hero"){
-            bodyA = contact.getFixtureA();
-            bodyB = contact.getFixtureB();
+            hero = contact.getFixtureA();
+            zombie = contact.getFixtureB();
         }else{
-            bodyB = contact.getFixtureA();
-            bodyA = contact.getFixtureB();
+            zombie = contact.getFixtureA();
+            hero = contact.getFixtureB();
         }
+        for(Zombie zombieObject : zombieArray){
+            if(zombieObject.body.getFixtureList().first().getUserData() == zombie.getUserData()){
+                if(zombieObject.state!= Zombie.State.dying){
+                    zombieObject.setState(Zombie.State.stop);
+                    this.reduceLifePoints();
+                }
+            }
+        }
+    }
 
-        System.out.println(bodyA.getUserData());
+    private void reduceLifePoints() {
+        this.lifePoints--;
+        this.recoverTimePassed=0;
+        if(lifePoints<1){
+            game.setScreen(new GameOverScreen(game));
+        }
     }
 
     @Override

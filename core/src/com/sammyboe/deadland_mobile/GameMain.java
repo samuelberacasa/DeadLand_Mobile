@@ -2,8 +2,10 @@ package com.sammyboe.deadland_mobile;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.sammyboe.deadland_mobile.Assets.ElementAssets;
 import com.sammyboe.deadland_mobile.Assets.HeroAssets;
 import com.sammyboe.deadland_mobile.Assets.ZombieAssets;
+import com.sammyboe.deadland_mobile.Screens.GameOverScreen;
 import com.sammyboe.deadland_mobile.Screens.MenuScreen;
 
 public class GameMain extends Game {
@@ -16,6 +18,8 @@ public class GameMain extends Game {
 		HeroAssets.manager.finishLoading();
 		ZombieAssets.load();
 		ZombieAssets.manager.finishLoading();
+		ElementAssets.load();
+		ElementAssets.manager.finishLoading();
 		setScreen(new MenuScreen(this));
 	}
 

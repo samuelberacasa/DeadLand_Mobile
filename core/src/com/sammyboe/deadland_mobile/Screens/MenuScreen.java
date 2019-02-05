@@ -4,16 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.sammyboe.deadland_mobile.Assets.ElementAssets;
 import com.sammyboe.deadland_mobile.GameMain;
 import com.sammyboe.deadland_mobile.Utils.GameVar;
 
 public class MenuScreen extends AbstractScreen {
-    public BitmapFont font;
+    public Texture newGame;
 
     public MenuScreen(GameMain game) {
         super(game);
-        font = new BitmapFont();
+        newGame = ElementAssets.manager.get(ElementAssets.newGame);
     }
 
     @Override
@@ -29,8 +31,7 @@ public class MenuScreen extends AbstractScreen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        font.draw(game.batch, "Welcomer to Deadland!!!", GameVar.GAME_WIDTH/3, GameVar.GAME_HEIGHT/2);
-        font.draw(game.batch, "Tap anywhere to begin", GameVar.GAME_WIDTH/3, GameVar.GAME_HEIGHT/3);
+        game.batch.draw(newGame,25,-50);
         game.batch.end();
         if(Gdx.input.isTouched()){
             game.setScreen(new GameScreen(game));
@@ -55,6 +56,6 @@ public class MenuScreen extends AbstractScreen {
 
     @Override
     public void dispose() {
-        font.dispose();
+
     }
 }

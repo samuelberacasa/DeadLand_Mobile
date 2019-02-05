@@ -8,13 +8,13 @@ public class ZombieAssets {
     public static final AssetManager manager = new AssetManager();
 
     public static final String
-            zombieAppears = "Zombie/zombieAppears.atlas",
-            zombieDying = "Zombie/zombieDying.atlas",
-            zombieMovingDown = "Zombie/zombieMovingDown.atlas",
-            zombieMovingLeft = "Zombie/zombieMovingLeft.atlas",
-            zombieMovingRight = "Zombie/zombieMovingRight.atlas",
-            zombieMovingUp = "Zombie/zombieMovingUp.atlas",
-            zombieStandDown = "Zombie/zombieStandDown.png";
+            zombieAppears = "Zombie/ZombieAppears.atlas",
+            zombieDying = "Zombie/ZombieDying.atlas",
+            zombieMovingDown = "Zombie/ZombieMovingDown.atlas",
+            zombieMovingLeft = "Zombie/ZombieMovingLeft.atlas",
+            zombieMovingRight = "Zombie/ZombieMovingRight.atlas",
+            zombieMovingUp = "Zombie/ZombieMovingUp.atlas",
+            zombieStandDown = "Zombie/ZombieStandDown.png";
 
     public static void load(){
         manager.load(zombieAppears, TextureAtlas.class);

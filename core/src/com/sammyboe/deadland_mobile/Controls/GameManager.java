@@ -5,15 +5,18 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.physics.box2d.World;
 import com.sammyboe.deadland_mobile.Characters.Character;
 import com.sammyboe.deadland_mobile.Characters.Hero;
+import com.sammyboe.deadland_mobile.GameMain;
+import com.sammyboe.deadland_mobile.Screens.GameOverScreen;
 
 public class GameManager implements InputProcessor {
     public World world;
     public Hero hero;
+    public GameMain game;
 
-    public GameManager(World world, Hero hero){
+    public GameManager(World world, Hero hero, GameMain game){
         this.world = world;
         this.hero = hero;
-
+        this.game = game;
     }
 
     public void keyActionDown(int key) {
@@ -22,27 +25,33 @@ public class GameManager implements InputProcessor {
                 System.exit(0);
                 break;
             case Input.Keys.DOWN:
-                hero.setDirection(Character.Direction.down);
+                hero.setDirection(Direction.down);
                 hero.setState(Hero.State.move);
                 hero.moveCharacter();
                 break;
             case Input.Keys.LEFT:
-                hero.setDirection(Character.Direction.left);
+                hero.setDirection(Direction.left);
                 hero.setState(Hero.State.move);
                 hero.moveCharacter();
                 break;
             case Input.Keys.RIGHT:
-                hero.setDirection(Character.Direction.right);
+                hero.setDirection(Direction.right);
                 hero.setState(Hero.State.move);
                 hero.moveCharacter();
                 break;
             case Input.Keys.UP:
-                hero.setDirection(Character.Direction.up);
+                hero.setDirection(Direction.up);
                 hero.setState(Hero.State.move);
                 hero.moveCharacter();
                 break;
-            case Input.Keys.D:
+            case Input.Keys.A:
                 hero.setState(Hero.State.knife);
+                break;
+            case Input.Keys.F:
+                hero.shoot();
+                break;
+            case Input.Keys.D:
+                game.setScreen(new GameOverScreen(game));
                 break;
         }
     }
